@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Estado Seleccionado: Texto Blanco -->
     <item android:color="#FFFFFF" android:state_checked="true" />
-
-    <!-- Estado Normal: Texto Negro -->
     <item android:color="#000000" />
 </selector>

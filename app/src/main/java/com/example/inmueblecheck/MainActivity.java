@@ -3,7 +3,7 @@ package com.example.inmueblecheck;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast; // Importante para feedback visual
+import android.widget.Toast;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -45,8 +45,6 @@ public class MainActivity extends AppCompatActivity {
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-
-        // ViewModel compartido (scoped to Activity) para que el filtro persista
         agenteViewModel = new ViewModelProvider(this).get(AgenteViewModel.class);
 
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
@@ -123,7 +121,6 @@ public class MainActivity extends AppCompatActivity {
         String mensaje = (tipo == null) ? "Mostrando todos" : "Mostrando solo: " + tipo;
         Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show();
 
-        // Si no estamos en la lista, ir a ella
         if (navController.getCurrentDestination().getId() != R.id.agenteDashboardFragment) {
             navController.navigate(R.id.agenteDashboardFragment);
         }

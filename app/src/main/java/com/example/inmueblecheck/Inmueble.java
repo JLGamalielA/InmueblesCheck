@@ -14,20 +14,15 @@ public class Inmueble {
     @NonNull
     @Exclude
     private String uid = "";
-
     private String arrendadorId;
     private String arrendadorEmail;
     private String datosContacto;
-
     private String direccion;
     private String descripcion;
     private double precio;
     private String tipoTransaccion;
     private String fotoPortada;
-
-    // NUEVO CAMPO: "disponible" o "no_disponible" (rentado/vendido)
     private String estado;
-
     private String statusSync;
     private double latitud;
     private double longitud;
@@ -36,7 +31,7 @@ public class Inmueble {
     private Date fechaCreacion;
 
     public Inmueble() {
-        // Constructor vacío necesario
+
     }
 
     public Inmueble(String direccion, double precio, String tipoTransaccion, String arrendadorId, String arrendadorEmail) {
@@ -46,7 +41,7 @@ public class Inmueble {
         this.tipoTransaccion = tipoTransaccion;
         this.arrendadorId = arrendadorId;
         this.arrendadorEmail = arrendadorEmail;
-        this.estado = "disponible"; // Por defecto nace disponible
+        this.estado = "disponible";
         this.statusSync = "pendiente_sync";
         this.fechaCreacion = new Date();
     }

@@ -36,8 +36,6 @@ public class DetalleInmuebleFragment extends Fragment implements OnMapReadyCallb
     private static final String TAG = "DetalleInmueble";
     private String inmuebleId;
     private DetalleInmuebleViewModel viewModel;
-
-    // Variable crítica: Guarda el objeto completo para usarlo al contactar
     private Inmueble currentInmueble;
 
     private TextView tvPrecio, tvDireccion, tvDescripcion, tvSinFotos;
@@ -48,7 +46,6 @@ public class DetalleInmuebleFragment extends Fragment implements OnMapReadyCallb
     private MaterialToolbar toolbar;
     private MediaAdapter mediaAdapter;
     private GoogleMap mMap;
-
     private double lat = 0, lon = 0;
     private String contactoStr = "";
     private String tituloInmueble = "";
@@ -113,7 +110,6 @@ public class DetalleInmuebleFragment extends Fragment implements OnMapReadyCallb
         viewModel.getInmueble().observe(getViewLifecycleOwner(), inmueble -> {
             progressBar.setVisibility(View.GONE);
             if (inmueble != null) {
-                // GUARDAR REFERENCIA (CRÍTICO)
                 this.currentInmueble = inmueble;
                 llenarDatos(inmueble);
             } else {
@@ -151,7 +147,6 @@ public class DetalleInmuebleFragment extends Fragment implements OnMapReadyCallb
         String tipo = inmueble.getTipoTransaccion() != null ? inmueble.getTipoTransaccion().toUpperCase() : "RENTA";
         chipTipo.setText(tipo);
 
-        // Ocultar botón si soy el dueño
         String currentUserId = FirebaseAuth.getInstance().getUid();
         if (currentUserId != null && currentUserId.equals(inmueble.getArrendadorId())) {
             btnContactar.setVisibility(View.GONE);
@@ -186,14 +181,12 @@ public class DetalleInmuebleFragment extends Fragment implements OnMapReadyCallb
     private void contactarDueno() {
         Log.d(TAG, "Botón Contactar presionado");
 
-        // Validación 1: ¿Tenemos los datos cargados?
         if (currentInmueble == null) {
             Log.e(TAG, "Error: currentInmueble es null al presionar contactar");
             Toast.makeText(getContext(), "Cargando datos, espera un momento...", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Validación 2: ¿Hay ID de arrendador?
         if (currentInmueble.getArrendadorId() == null) {
             Log.e(TAG, "Error: arrendadorId es null");
             Toast.makeText(getContext(), "Error: No se puede identificar al dueño", Toast.LENGTH_SHORT).show();
@@ -202,7 +195,6 @@ public class DetalleInmuebleFragment extends Fragment implements OnMapReadyCallb
 
         Log.d(TAG, "Iniciando chat con: " + currentInmueble.getArrendadorId());
 
-        // Feedback visual
         btnContactar.setEnabled(false);
         btnContactar.setText("Abriendo chat...");
 
@@ -213,10 +205,8 @@ public class DetalleInmuebleFragment extends Fragment implements OnMapReadyCallb
                 currentInmueble.getDireccion(),
                 currentInmueble.getUid(),
                 chatId -> {
-                    // Asegurar ejecución en hilo principal por si el callback viene de otro hilo
                     if (getActivity() != null) {
                         getActivity().runOnUiThread(() -> {
-                            // Restaurar botón
                             btnContactar.setEnabled(true);
                             btnContactar.setText("Contactar Arrendador");
 
@@ -227,7 +217,6 @@ public class DetalleInmuebleFragment extends Fragment implements OnMapReadyCallb
                                 args.putString("titulo", currentInmueble.getDireccion());
 
                                 try {
-                                    // Navegar al chat usando la acción global definida en nav_auth.xml
                                     Navigation.findNavController(requireView()).navigate(R.id.action_global_conversacionFragment, args);
                                 } catch (Exception e) {
                                     Log.e(TAG, "Error CRÍTICO navegando al fragmento de conversación", e);

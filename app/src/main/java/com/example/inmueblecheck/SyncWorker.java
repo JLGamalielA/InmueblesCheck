@@ -37,25 +37,19 @@ public class SyncWorker extends Worker {
         Log.d(TAG, "Iniciando sincronización...");
 
         try {
-            // 1. Buscar inmuebles pendientes
+            // Buscar inmuebles pendientes
             List<Inmueble> inmueblesPendientes = dao.getInmueblesPendientesDeSubida();
             if (inmueblesPendientes.isEmpty()) {
                 return Result.success();
             }
 
             for (Inmueble inmueble : inmueblesPendientes) {
-                // 2. Primero subimos las fotos (para tener las URLs listas)
                 uploadMedia(inmueble.getUid());
-
-                // 3. Buscamos si hay una "Foto Principal" ya subida con URL remota
                 Media fotoPrincipal = dao.getFotoPrincipal(inmueble.getUid());
                 if (fotoPrincipal != null && fotoPrincipal.getRemoteUri() != null) {
-                    // CRÍTICO: Reemplazamos la ruta local con la URL de internet antes de subir a Firestore
                     inmueble.setFotoPortada(fotoPrincipal.getRemoteUri());
                     Log.d(TAG, "URL de portada actualizada para la nube: " + fotoPrincipal.getRemoteUri());
                 }
-
-                // 4. Subimos el inmueble con la URL correcta
                 uploadInmuebleData(inmueble);
             }
 
@@ -80,7 +74,6 @@ public class SyncWorker extends Worker {
 
                 UploadTask uploadTask = storageRef.putFile(fileUri);
 
-                // Obtener URL de descarga
                 Task<Uri> urlTask = uploadTask.continueWithTask(task -> {
                     if (!task.isSuccessful()) throw task.getException();
                     return storageRef.getDownloadUrl();
@@ -88,20 +81,17 @@ public class SyncWorker extends Worker {
 
                 Uri downloadUri = Tasks.await(urlTask);
 
-                // Actualizar DB Local con la URL remota
                 media.setRemoteUri(downloadUri.toString());
                 media.setSynced(true);
                 dao.updateMedia(media);
 
             } catch (Exception e) {
                 Log.e(TAG, "Fallo al subir archivo: " + media.getLocalUri(), e);
-                // No lanzamos excepción para intentar con los siguientes archivos
             }
         }
     }
 
     private void uploadInmuebleData(Inmueble inmueble) throws ExecutionException, InterruptedException {
-        // Marcamos como sincronizado antes de subir para evitar bucles si la UI se actualiza
         inmueble.setStatusSync("sincronizado");
 
         Task<Void> task = db.collection("inmuebles")

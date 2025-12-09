@@ -1,11 +1,8 @@
 package com.example.inmueblecheck;
 
-import android.graphics.Color;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,11 +15,13 @@ import java.util.Locale;
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHolder> {
 
     private List<Message> messages = new ArrayList<>();
-    private String currentUserId;
+    private final String currentUserId;
 
     public ChatAdapter() {
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        } else {
+            currentUserId = "";
         }
     }
 
@@ -34,7 +33,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
     @NonNull
     @Override
     public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_message, parent, false);
         return new MessageViewHolder(view);
     }
 
@@ -50,38 +50,43 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
     }
 
     static class MessageViewHolder extends RecyclerView.ViewHolder {
-        TextView tvSender, tvMessageText, tvTimestamp;
-        LinearLayout messageContainer;
+
+        TextView tvMessageMe, tvTimeMe;
+        TextView tvMessageOther, tvTimeOther;
 
         public MessageViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvSender = itemView.findViewById(R.id.tvSender);
-            tvMessageText = itemView.findViewById(R.id.tvMessageText);
-            tvTimestamp = itemView.findViewById(R.id.tvTimestamp);
-            messageContainer = itemView.findViewById(R.id.messageContainer);
+            tvMessageMe = itemView.findViewById(R.id.tvMessageMe);
+            tvTimeMe = itemView.findViewById(R.id.tvTimeMe);
+            tvMessageOther = itemView.findViewById(R.id.tvMessageOther);
+            tvTimeOther = itemView.findViewById(R.id.tvTimeOther);
         }
 
         public void bind(Message message, String currentUserId) {
-            tvMessageText.setText(message.getText());
-            tvSender.setText(message.getSenderEmail());
-
-            if(message.getTimestamp() != null) {
-                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
-                tvTimestamp.setText(sdf.format(message.getTimestamp()));
-            }
-
-            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) messageContainer.getLayoutParams();
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            String time = (message.getTimestamp() != null)
+                    ? sdf.format(message.getTimestamp())
+                    : "Enviando...";
 
             if (message.getSenderId() != null && message.getSenderId().equals(currentUserId)) {
-                // Mensaje enviado por mí (Derecha, Azul claro)
-                params.gravity = Gravity.END;
-                messageContainer.setBackgroundColor(Color.parseColor("#E3F2FD"));
+                // Es MI mensaje -
+                tvMessageMe.setVisibility(View.VISIBLE);
+                tvTimeMe.setVisibility(View.VISIBLE);
+                tvMessageOther.setVisibility(View.GONE);
+                tvTimeOther.setVisibility(View.GONE);
+
+                tvMessageMe.setText(message.getText());
+                tvTimeMe.setText(time);
             } else {
-                // Mensaje recibido (Izquierda, Gris claro)
-                params.gravity = Gravity.START;
-                messageContainer.setBackgroundColor(Color.parseColor("#F5F5F5"));
+                // Es mensaje de OTRO
+                tvMessageMe.setVisibility(View.GONE);
+                tvTimeMe.setVisibility(View.GONE);
+                tvMessageOther.setVisibility(View.VISIBLE);
+                tvTimeOther.setVisibility(View.VISIBLE);
+
+                tvMessageOther.setText(message.getText());
+                tvTimeOther.setText(time);
             }
-            messageContainer.setLayoutParams(params);
         }
     }
 }

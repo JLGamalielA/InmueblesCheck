@@ -33,7 +33,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ivIllustration" />
 
-    <!-- Texto de introducción -->
     <TextView
         android:id="@+id/tvSubtitle"
         android:layout_width="0dp"
@@ -47,7 +46,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
 
-    <!-- Email  -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilEmail"
         style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
@@ -72,7 +70,6 @@
             android:textSize="16sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!--  Password -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilPassword"
         style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
@@ -97,7 +94,6 @@
             android:textSize="16sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Botón Login -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLogin"
         android:layout_width="0dp"
@@ -113,7 +109,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tilPassword" />
 
-    <!-- Footer: Crear cuenta -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

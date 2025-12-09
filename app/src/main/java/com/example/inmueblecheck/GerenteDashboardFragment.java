@@ -50,7 +50,7 @@ public class GerenteDashboardFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
 
-        // 1. Ver Detalle
+        // Ver Detalle
         adapter.setOnInmuebleClickListener(inmueble -> {
             if (inmueble != null && inmueble.getUid() != null) {
                 Bundle args = new Bundle();
@@ -62,7 +62,7 @@ public class GerenteDashboardFragment extends Fragment {
             }
         });
 
-        // 2. Editar
+        // Editar
         adapter.setOnEditarClickListener(inmueble -> {
             if (inmueble != null && inmueble.getUid() != null) {
                 Bundle args = new Bundle();
@@ -74,7 +74,7 @@ public class GerenteDashboardFragment extends Fragment {
             }
         });
 
-        // 3. Mover a Historial
+        // Mover a Historial
         adapter.setOnEstadoClickListener(inmueble -> {
             String accion = "Venta".equalsIgnoreCase(inmueble.getTipoTransaccion()) ? "vendido" : "rentado";
             new AlertDialog.Builder(getContext())

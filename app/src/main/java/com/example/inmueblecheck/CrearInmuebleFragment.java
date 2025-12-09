@@ -49,7 +49,7 @@ public class CrearInmuebleFragment extends Fragment {
     private GerenteViewModel viewModel;
 
     private TextInputEditText etDireccion, etPrecio, etContacto, etDescripcion;
-    private TextInputLayout tilDireccion; // Referencia al contenedor para ocultarlo
+    private TextInputLayout tilDireccion;
     private RadioGroup rgTipo;
     private Button btnGuardar;
     private FloatingActionButton btnFoto;
@@ -79,7 +79,7 @@ public class CrearInmuebleFragment extends Fragment {
                 new ActivityResultContracts.RequestPermission(), isGranted -> {
                     if (isGranted) obtenerUbicacionGps();
                     else {
-                        switchUbicacion.setChecked(false); // Si niega, apaga el switch
+                        switchUbicacion.setChecked(false);
                         Toast.makeText(getContext(), "Permiso de ubicación requerido", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -117,7 +117,7 @@ public class CrearInmuebleFragment extends Fragment {
 
     private void initViews(View view) {
         etDireccion = view.findViewById(R.id.etDireccion);
-        tilDireccion = view.findViewById(R.id.tilDireccion); // Contenedor
+        tilDireccion = view.findViewById(R.id.tilDireccion);
         etPrecio = view.findViewById(R.id.etPrecio);
         etContacto = view.findViewById(R.id.etContacto);
         etDescripcion = view.findViewById(R.id.etDescripcion);
@@ -137,12 +137,12 @@ public class CrearInmuebleFragment extends Fragment {
 
         toolbar.setNavigationOnClickListener(v -> Navigation.findNavController(v).popBackStack());
 
-        // LÓGICA DEL SWITCH
+
         switchUbicacion.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 // Activar GPS -> Ocultar entrada manual
                 tilDireccion.setVisibility(View.GONE);
-                checkGpsPermission(); // Pedir permiso y obtener coordenadas
+                checkGpsPermission();
             } else {
                 // Manual -> Mostrar entrada
                 tilDireccion.setVisibility(View.VISIBLE);
@@ -178,22 +178,18 @@ public class CrearInmuebleFragment extends Fragment {
                     currentLon = location.getLongitude();
                     tvCoordenadas.setText(String.format(Locale.getDefault(), "Ubicación Exacta: %.5f, %.5f", currentLat, currentLon));
                     tvCoordenadas.setTextColor(ContextCompat.getColor(requireContext(), R.color.blue_primary));
-
-                    // Opcional: Llenar internamente la dirección para mostrar algo en la lista
                     buscarDireccionDesdeCoordenadas(currentLat, currentLon);
                 } else {
                     tvCoordenadas.setText("No se pudo obtener ubicación. Intente de nuevo.");
-                    switchUbicacion.setChecked(false); // Regresar a manual si falla
-                }
+                    switchUbicacion.setChecked(false);                }
             });
         } catch (SecurityException e) { e.printStackTrace(); }
     }
 
-    // --- GUARDADO INTELIGENTE ---
+    // --- GUARDADO  ---
     private void guardarInmueble() {
         String direccionFinal = "";
 
-        // 1. Si es manual (Switch OFF) -> Leer caja de texto y resolver
         if (!switchUbicacion.isChecked()) {
             String input = etDireccion.getText().toString().trim();
             if (TextUtils.isEmpty(input)) {
@@ -202,10 +198,8 @@ public class CrearInmuebleFragment extends Fragment {
             }
             direccionFinal = input;
 
-            // Intentar resolver coordenadas si el usuario puso una dirección
             resolverCoordenadasDesdeTexto(input);
         } else {
-            // 2. Si es GPS (Switch ON) -> Usar lat/lon obtenidos
             if (currentLat == 0 && currentLon == 0) {
                 Toast.makeText(getContext(), "Esperando señal GPS...", Toast.LENGTH_SHORT).show();
                 return;
@@ -250,7 +244,7 @@ public class CrearInmuebleFragment extends Fragment {
             List<Address> addresses = geocoder.getFromLocation(lat, lon, 1);
             if (addresses != null && !addresses.isEmpty()) {
                 String dir = addresses.get(0).getAddressLine(0);
-                etDireccion.setText(dir); // Llenamos el campo aunque esté oculto para guardarlo
+                etDireccion.setText(dir);
             }
         } catch (IOException e) { }
     }
@@ -297,8 +291,6 @@ public class CrearInmuebleFragment extends Fragment {
                     Glide.with(this).load(currentPhotoPath).centerCrop().into(ivFoto);
                 }
 
-                // Si ya tenía coordenadas, podemos asumir que se usó GPS o manual verificado?
-                // Por defecto dejamos el switch apagado para permitir edición manual, o podrías encenderlo si prefieres.
                 if (currentLat != 0) {
                     tvCoordenadas.setText(String.format(Locale.getDefault(), "Guardada: %.5f, %.5f", currentLat, currentLon));
                 }
@@ -306,7 +298,7 @@ public class CrearInmuebleFragment extends Fragment {
         });
     }
 
-    // --- CÁMARA (Sin cambios) ---
+    // --- CÁMARA  ---
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(requireActivity().getPackageManager()) != null) {

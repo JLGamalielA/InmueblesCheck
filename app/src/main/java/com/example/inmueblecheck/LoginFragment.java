@@ -42,33 +42,18 @@ public class LoginFragment extends Fragment {
         setupClickListeners();
         setupObservers();
 
-        // AUTO-LOGIN: Verificar si ya hay usuario activo
+        // AUTO-LOGIN:
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            // Simulamos un login exitoso para disparar la lógica de roles
-            // (Ojo: AuthViewModel debería tener un método checkSession, pero
-            //  podemos reutilizar login si los campos están vacíos o manejarlo aquí)
-
-            // Opción rápida: Forzar la recarga del rol
             progressBar.setVisibility(View.VISIBLE);
             btnLogin.setEnabled(false);
-            // Reutilizamos la lógica del ViewModel que busca el rol
             authViewModel.login(FirebaseAuth.getInstance().getCurrentUser().getEmail(), "dummy_password_skip");
-            // Nota: Esto fallará en login normal, así que mejor implementamos una verificación directa en VM
-            // O simplemente forzamos el fetch si ya estamos logueados:
         }
     }
 
-    // Mejor enfoque para Auto-Login en onStart
     @Override
     public void onStart() {
         super.onStart();
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            // El usuario ya está logueado, necesitamos saber su rol para redirigir
-            // Como no tenemos el rol guardado localmente (SharedPrefs),
-            // dejamos que el usuario se loguee o (Mejora futura) guardamos el rol en SharedPrefs.
-
-            // Por ahora, para no complicar, dejaremos que se logueen,
-            // pero si quieres auto-login real, avísame para agregar UserSessionManager.
         }
     }
 
@@ -99,7 +84,7 @@ public class LoginFragment extends Fragment {
                     progressBar.setVisibility(View.GONE);
                     btnLogin.setEnabled(true);
 
-                    // Navegación basada en ROL
+                    // Navegación en ROL
                     if ("arrendador".equals(authResultState.role) || "gerente".equals(authResultState.role)) {
                         Navigation.findNavController(getView()).navigate(R.id.action_loginFragment_to_gerenteDashboardFragment);
                     } else {
@@ -107,7 +92,6 @@ public class LoginFragment extends Fragment {
                     }
                     break;
                 case ERROR:
-                    // Ignoramos error si fue intento de auto-login silencioso
                     progressBar.setVisibility(View.GONE);
                     btnLogin.setEnabled(true);
                     if (!authResultState.errorMessage.contains("dummy")) {

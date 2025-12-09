@@ -74,7 +74,6 @@ public class MapaFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void setupFilters() {
-        // Filtro Tipo (Venta/Renta)
         cgTipo.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.chipVenta) {
                 viewModel.setFiltroTipo("Venta");
@@ -85,10 +84,9 @@ public class MapaFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        // Filtro Precio (Diálogo Personalizado)
+        // Filtro Precio
         chipPrecio.setOnClickListener(v -> mostrarDialogoRangoPrecio());
     }
-
     private void mostrarDialogoRangoPrecio() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_filtro_precio, null);
@@ -109,7 +107,6 @@ public class MapaFragment extends Fragment implements OnMapReadyCallback {
 
             viewModel.setRangoPrecio(min, max);
 
-            // Actualizar etiqueta del botón
             if (max == -1) chipPrecio.setText("Más de $" + (int)min);
             else chipPrecio.setText("$" + (int)min + " - $" + (int)max);
 

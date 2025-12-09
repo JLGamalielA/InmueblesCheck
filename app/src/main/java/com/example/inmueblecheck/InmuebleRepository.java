@@ -33,7 +33,7 @@ public class InmuebleRepository {
         executor = Executors.newSingleThreadExecutor();
     }
 
-    // --- MÉTODOS PARA EL ARRENDADOR (DUEÑO) ---
+    // --- MÉTODOS PARA EL ARRENDADOR  ---
 
     // Obtener SOLO mis propiedades ACTIVAS
     public LiveData<List<Inmueble>> getMisInmuebles() {
@@ -46,7 +46,7 @@ public class InmuebleRepository {
         return null;
     }
 
-    // Obtener historial (Opcional, si lo usas desde el Repo en vez del ViewModel directamente)
+    // Obtener historial
     public LiveData<List<Inmueble>> getMisInmueblesHistorial() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
@@ -94,11 +94,11 @@ public class InmuebleRepository {
                 });
     }
 
-    // --- MÉTODOS PARA EL ARRENDATARIO (CLIENTE) ---
+    // --- MÉTODOS PARA EL ARRENDATARIO ---
 
     public LiveData<List<Inmueble>> getCatalogoInmuebles() {
         refreshCatalogoFromFirestore();
-        return inmuebleDao.getAllInmuebles(); // Este ya filtra por 'disponible' en el DAO
+        return inmuebleDao.getAllInmuebles();
     }
 
     private void refreshCatalogoFromFirestore() {

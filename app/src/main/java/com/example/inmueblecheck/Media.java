@@ -12,10 +12,10 @@ public class Media {
     private String mediaId;
     private String inspectionId;
     private String itemName;
-    private String localUri; // Dónde está en el teléfono
-    private String remoteUri; // Dónde se subió en Firebase Storage
+    private String localUri;
+    private String remoteUri;
 
-    private String type; // "image" o "video"
+    private String type;
     private boolean isSynced;
 
     public Media() {

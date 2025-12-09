@@ -27,7 +27,6 @@ public class HistorialFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Reutilizamos el layout del dashboard porque es idéntico
         return inflater.inflate(R.layout.fragment_gerente_dashboard, container, false);
     }
 
@@ -57,7 +56,7 @@ public class HistorialFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
 
-        // Listener: Restaurar a Activos
+        // Restaurar a Activos
         adapter.setOnEstadoClickListener(inmueble -> {
             new AlertDialog.Builder(getContext())
                     .setTitle("¿Reactivar propiedad?")
@@ -70,7 +69,6 @@ public class HistorialFragment extends Fragment {
                     .show();
         });
 
-        // No ponemos listener de Editar en historial, o sí si quieres editar registros viejos
     }
 
     private void setupObservers() {

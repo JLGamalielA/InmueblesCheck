@@ -1,7 +1,5 @@
 package com.example.inmueblecheck;
 
-// POJO (Plain Old Java Object) para un Usuario
-// llenar el Spinner de Agentes
 public class User {
     private String uid;
     private String email;

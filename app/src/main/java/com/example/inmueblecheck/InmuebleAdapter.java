@@ -21,7 +21,7 @@ public class InmuebleAdapter extends RecyclerView.Adapter<InmuebleAdapter.Inmueb
     private List<Inmueble> listaInmuebles = new ArrayList<>();
     private OnInmuebleClickListener clickListener;
     private OnEditarClickListener editarListener;
-    private OnEstadoClickListener estadoListener; // Nuevo listener para Historial
+    private OnEstadoClickListener estadoListener;
 
     public interface OnInmuebleClickListener { void onInmuebleClick(Inmueble inmueble); }
     public interface OnEditarClickListener { void onEditarClick(Inmueble inmueble); }
@@ -108,10 +108,8 @@ public class InmuebleAdapter extends RecyclerView.Adapter<InmuebleAdapter.Inmueb
 
                 // Cambiar icono según estado actual
                 if ("disponible".equals(inmueble.getEstado())) {
-                    // Si está disponible, el icono es "Archivar/Marcar Rentado"
                     btnEstado.setImageResource(android.R.drawable.checkbox_on_background);
                 } else {
-                    // Si está en historial, el icono es "Restaurar/Reciclar"
                     btnEstado.setImageResource(android.R.drawable.ic_menu_revert);
                 }
             } else {

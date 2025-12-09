@@ -22,7 +22,7 @@ public class RegisterFragment extends Fragment {
     private AuthViewModel authViewModel;
     private TextInputEditText etEmail, etPassword;
     private RadioGroup radioGroupRole;
-    private RadioButton radioArrendatario, radioArrendador; // Referencias para cambiar texto si es necesario
+    private RadioButton radioArrendatario, radioArrendador;
     private Button btnRegister;
     private TextView tvGoToLogin;
     private ProgressBar progressBar;
@@ -42,9 +42,9 @@ public class RegisterFragment extends Fragment {
         etPassword = view.findViewById(R.id.etPasswordRegister);
         radioGroupRole = view.findViewById(R.id.radioGroupRole);
 
-        // Reutilizamos los IDs del layout anterior, pero cambiamos su significado lógico
-        radioArrendatario = view.findViewById(R.id.radioAgente); // ID original era radioAgente
-        radioArrendador = view.findViewById(R.id.radioGerente); // ID original era radioGerente
+
+        radioArrendatario = view.findViewById(R.id.radioAgente);
+        radioArrendador = view.findViewById(R.id.radioGerente);
 
         radioArrendatario.setText("Busco Inmueble ");
         radioArrendador.setText("Vendo Inmueble ");
@@ -65,11 +65,10 @@ public class RegisterFragment extends Fragment {
             int selectedRoleId = radioGroupRole.getCheckedRadioButtonId();
             String role;
 
-            // Mapeo de IDs antiguos a Roles Nuevos
             if (selectedRoleId == R.id.radioGerente) {
-                role = "arrendador"; // Dueño
+                role = "arrendador";
             } else {
-                role = "arrendatario"; // Cliente
+                role = "arrendatario";
             }
 
             if (email.isEmpty() || password.isEmpty()) {

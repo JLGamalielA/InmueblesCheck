@@ -21,7 +21,6 @@ public class AgenteViewModel extends AndroidViewModel {
     private final MutableLiveData<String> filtroTipo = new MutableLiveData<>(null); // "Venta", "Renta", null
 
     // Filtro de Rango de Precio (null = sin filtro)
-    // Usamos un array [min, max]. Si max es -1, significa "y más".
     private final MutableLiveData<double[]> rangoPrecio = new MutableLiveData<>(null);
 
     public AgenteViewModel(@NonNull Application application) {
@@ -49,10 +48,10 @@ public class AgenteViewModel extends AndroidViewModel {
                                     double max = rango[1];
 
                                     if (max == -1) {
-                                        // Rango: "X o más" (ej: 500 en adelante)
+                                        // Rango: "X o más"
                                         if (precio < min) pasaPrecio = false;
                                     } else {
-                                        // Rango: "Entre X y Y" (ej: 0 a 500)
+                                        // Rango: "Entre X y Y"
                                         if (precio < min || precio > max) pasaPrecio = false;
                                     }
                                 }

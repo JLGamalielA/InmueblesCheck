@@ -147,7 +147,7 @@
                         android:textColor="@color/gray_text"
                         android:layout_marginBottom="8dp"/>
 
-                    <!-- CAMPO DE DIRECCIÓN (Visible solo si Switch está OFF) -->
+                    <!-- CAMPO DE DIRECCIÓN  -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/tilDireccion"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"

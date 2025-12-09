@@ -61,18 +61,13 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
             String label = media.getItemName();
             tvMediaItemName.setText(label);
 
-            // Configuración de Glide para imágenes y videos
             if ("video".equals(media.getType())) {
-                // Glide puede generar miniaturas de videos locales o remotos
                 Glide.with(context)
-                        .asBitmap() // Forzar carga como imagen (frame del video)
+                        .asBitmap()
                         .load(media.getRemoteUri() != null ? media.getRemoteUri() : media.getLocalUri())
                         .placeholder(android.R.drawable.ic_media_play)
                         .centerCrop()
                         .into(ivMedia);
-
-                // Icono superpuesto para indicar que es video (opcional, visualmente recomendado)
-                // Aquí asumimos que el ImageView tiene un click listener
             } else {
                 Glide.with(context)
                         .load(media.getRemoteUri() != null ? media.getRemoteUri() : media.getLocalUri())
@@ -82,7 +77,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
                         .into(ivMedia);
             }
 
-            // --- NUEVO: Clic para abrir el archivo (Imagen o Video) ---
+            // --- Clic para abrir Imagen  ---
             itemView.setOnClickListener(v -> {
                 String uriString = media.getRemoteUri() != null ? media.getRemoteUri() : media.getLocalUri();
                 if (uriString != null) {
@@ -93,11 +88,9 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
                     try {
                         context.startActivity(intent);
                     } catch (Exception e) {
-                        // Fallback si no hay app para abrir
                     }
                 }
             });
-            // ----------------------------------------------------------
         }
     }
 }

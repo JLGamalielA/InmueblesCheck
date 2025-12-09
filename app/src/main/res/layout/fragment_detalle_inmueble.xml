@@ -123,7 +123,6 @@
                     android:layout_marginTop="24dp"
                     android:layout_marginBottom="12dp"/>
 
-                <!-- MAPA INTEGRADO (Reemplaza al botón) -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
@@ -137,12 +136,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />
 
-                    <!-- Overlay transparente para capturar clicks si se desea expandir en el futuro,
-                         o dejar libre para interactuar (scroll map inside scrollview requires special handling,
-                         for now "Lite Mode" is safer or disabling parent scroll on touch) -->
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Botón Contactar (Se ocultará si eres dueño) -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnContactar"
                     android:layout_width="match_parent"

@@ -6,14 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- El Mapa de Google -->
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- Barra de Filtros Flotante -->
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,7 +26,6 @@
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <!-- GRUPO TIPO: Selección única (Venta o Renta) -->
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/cgTipo"
                 android:layout_width="wrap_content"
@@ -37,7 +34,6 @@
                 app:selectionRequired="false"
                 android:layout_marginEnd="8dp">
 
-                <!-- Chip Venta -->
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipVenta"
                     style="@style/Widget.MaterialComponents.Chip.Filter"
@@ -51,7 +47,6 @@
                     app:checkedIconVisible="true"
                     app:checkedIconTint="@color/white"/>
 
-                <!-- Chip Renta -->
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipRenta"
                     style="@style/Widget.MaterialComponents.Chip.Filter"
@@ -66,14 +61,12 @@
                     app:checkedIconTint="@color/white"/>
             </com.google.android.material.chip.ChipGroup>
 
-            <!-- Separador visual -->
             <View
                 android:layout_width="1dp"
                 android:layout_height="24dp"
                 android:background="#808080"
                 android:layout_marginEnd="8dp"/>
 
-            <!-- FILTRO PRECIO (Botón desplegable) -->
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipPrecio"
                 style="@style/Widget.MaterialComponents.Chip.Action"

@@ -38,7 +38,7 @@
             app:popUpToInclusive="true" />
     </fragment>
 
-    <!-- DASHBOARD ARRENDADOR  -->
+    <!--  ARRENDADOR  -->
     <fragment
         android:id="@+id/gerenteDashboardFragment"
         android:name="com.example.inmueblecheck.GerenteDashboardFragment"
@@ -47,7 +47,6 @@
         <action
             android:id="@+id/action_gerenteDashboardFragment_to_crearInmuebleFragment"
             app:destination="@id/crearInmuebleFragment" />
-        <!-- Nueva acción para ver detalle -->
         <action
             android:id="@+id/action_gerente_to_detalle"
             app:destination="@id/detalleInmuebleFragment" />

@@ -20,7 +20,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Contenedor de Imagen y Botones -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="180dp">
@@ -40,7 +39,6 @@
                 android:layout_gravity="top|end"
                 android:layout_margin="8dp">
 
-                <!-- Botón Estado (Check/Archive) -->
                 <ImageButton
                     android:id="@+id/btnEstado"
                     android:layout_width="40dp"
@@ -52,7 +50,6 @@
                     android:elevation="4dp"
                     android:contentDescription="Cambiar Estado"/>
 
-                <!-- Botón Editar -->
                 <ImageButton
                     android:id="@+id/btnEditar"
                     android:layout_width="40dp"

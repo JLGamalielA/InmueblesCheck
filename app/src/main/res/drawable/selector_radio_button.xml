@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Estado Seleccionado: Fondo blanco con borde azul suave y esquinas redondeadas -->
+    <!-- Estado Seleccionado -->
     <item android:state_checked="true">
         <shape android:shape="rectangle">
             <solid android:color="@color/white"/>
@@ -10,7 +10,7 @@
         </shape>
     </item>
 
-    <!-- Estado Normal (No seleccionado): Transparente -->
+    <!-- Estado Normal:  -->
     <item>
         <shape android:shape="rectangle">
             <solid android:color="@android:color/transparent"/>

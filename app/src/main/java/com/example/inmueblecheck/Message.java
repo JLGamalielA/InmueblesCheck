@@ -4,14 +4,13 @@ import com.google.firebase.firestore.ServerTimestamp;
 import java.util.Date;
 
 public class Message {
-    private String messageId;
     private String text;
     private String senderId;
     private String senderEmail;
     @ServerTimestamp
     private Date timestamp;
 
-    public Message() {} // Constructor vacío requerido por Firestore
+    public Message() {}
 
     public Message(String text, String senderId, String senderEmail) {
         this.text = text;
@@ -19,8 +18,7 @@ public class Message {
         this.senderEmail = senderEmail;
     }
 
-    public String getMessageId() { return messageId; }
-    public void setMessageId(String messageId) { this.messageId = messageId; }
+    // Getters y Setters
     public String getText() { return text; }
     public void setText(String text) { this.text = text; }
     public String getSenderId() { return senderId; }

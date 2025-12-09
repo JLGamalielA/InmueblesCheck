@@ -39,7 +39,6 @@ public class AuthViewModel extends AndroidViewModel {
                 });
     }
 
-    // Método actualizado para manejar los nuevos roles
     public void register(String email, String password, String role) {
         _authResult.setValue(AuthResultState.loading());
         if (password.length() < 6) {
@@ -62,7 +61,6 @@ public class AuthViewModel extends AndroidViewModel {
         Map<String, Object> userData = new HashMap<>();
         userData.put("uid", uid);
         userData.put("email", user.getEmail());
-        //  "arrendador" o "arrendatario"
         userData.put("role", role);
 
         mDb.collection("users").document(uid)

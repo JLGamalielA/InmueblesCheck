@@ -13,7 +13,7 @@ import java.util.concurrent.Executors;
 public class GerenteViewModel extends AndroidViewModel {
 
     private final InmuebleRepository repository;
-    private final InmuebleDao dao; // Acceso directo para operaciones rápidas
+    private final InmuebleDao dao;
     private final MutableLiveData<String> error = new MutableLiveData<>();
     private final MutableLiveData<Boolean> saveSuccess = new MutableLiveData<>();
 
@@ -45,9 +45,6 @@ public class GerenteViewModel extends AndroidViewModel {
 
         Executors.newSingleThreadExecutor().execute(() -> {
             dao.actualizarEstado(inmueble.getUid(), nuevoEstado);
-            // El Repository ya tiene un SyncWorker programado, pero idealmente aquí llamaríamos a scheduleSync()
-            // Por simplicidad, confiamos en que el próximo ciclo o guardado lo suba,
-            // o puedes inyectar el repositorio aquí para llamar scheduleSync.
         });
     }
 
@@ -80,10 +77,7 @@ public class GerenteViewModel extends AndroidViewModel {
             inmueble.setDireccion(direccion);
             inmueble.setPrecio(precio);
             inmueble.setTipoTransaccion(tipo);
-            inmueble.setEstado("disponible"); // Al editar, asumimos que sigue/vuelve a estar disponible? O mantenemos el estado?
-            // Mejor mantenemos el estado actual si es edición, pero por simplicidad de este método, lo reseteamos o lo dejamos
-            // Para ser robustos, en un update real deberíamos leer el estado anterior.
-            // Pero en este flujo "Guardar" suele implicar ponerlo activo.
+            inmueble.setEstado("disponible");
             inmueble.setStatusSync("pendiente_sync");
         }
 

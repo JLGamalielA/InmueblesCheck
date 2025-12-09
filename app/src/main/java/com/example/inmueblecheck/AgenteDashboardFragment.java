@@ -37,16 +37,12 @@ public class AgenteDashboardFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Inicializar Vistas (Solo las que quedaron en el XML limpio)
         recyclerView = view.findViewById(R.id.rvInspecciones);
         progressBar = view.findViewById(R.id.progressBarAgente);
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshAgente);
         tvWelcomeTitle = view.findViewById(R.id.tvWelcomeTitle);
         tvWelcomeSubtitle = view.findViewById(R.id.tvWelcomeSubtitle);
-
         swipeRefreshLayout.setColorSchemeResources(R.color.blue_primary);
-
-        // Usamos requireActivity() para compartir el estado de los filtros con el MainActivity
         viewModel = new ViewModelProvider(requireActivity()).get(AgenteViewModel.class);
 
         setupRecyclerView();

@@ -11,7 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Header Azul Moderno -->
         <View
             android:id="@+id/headerBg"
             android:layout_width="match_parent"
@@ -52,7 +51,6 @@
             app:layout_constraintStart_toStartOf="@+id/tvTituloDashboard"
             app:layout_constraintTop_toBottomOf="@+id/tvTituloDashboard" />
 
-        <!-- Lista de Inmuebles -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewInspecciones"
             android:layout_width="match_parent"

@@ -9,7 +9,6 @@
     android:padding="24dp"
     tools:context=".RegisterFragment">
 
-    <!-- 1. Imagen de Perfil / Avatar (Estilo circular) -->
     <ImageView
         android:id="@+id/ivAvatarPlaceholder"
         android:layout_width="100dp"
@@ -24,7 +23,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Título -->
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
@@ -38,7 +36,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ivAvatarPlaceholder" />
 
-    <!-- 3. Subtítulo -->
     <TextView
         android:id="@+id/tvSubtitle"
         android:layout_width="0dp"
@@ -52,9 +49,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
 
-    <!-- 4. Campo Nombre (Visualmente agregado para coincidir con imagen, opcional en lógica) -->
-    <!-- Nota: Tu lógica actual no procesa 'Nombre', así que este es solo visual
-         o para futura implementación. Si no lo quieres, puedes borrar este bloque. -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilNameRegister"
         style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
@@ -79,7 +73,6 @@
             android:textSize="16sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- 5. Campo Email -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilEmailRegister"
         style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
@@ -104,7 +97,6 @@
             android:textSize="16sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- 6. Campo Password -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilPasswordRegister"
         style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
@@ -130,7 +122,6 @@
             android:textSize="16sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- 7. Selección de Rol (Estilizada) -->
     <TextView
         android:id="@+id/tvRoleLabel"
         android:layout_width="wrap_content"
@@ -166,7 +157,6 @@
             android:textColor="@color/selector_radio_button"
             android:textSize="16sp" />
 
-        <!-- RadioButton GERENTE con selector de color -->
         <RadioButton
             android:id="@+id/radioGerente"
             android:layout_width="wrap_content"
@@ -180,7 +170,6 @@
             android:textSize="16sp" />
     </RadioGroup>
 
-    <!-- 8. Botón Sign Up -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnRegister"
         android:layout_width="0dp"
@@ -196,7 +185,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radioGroupRole" />
 
-    <!-- 9. Footer Login -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
