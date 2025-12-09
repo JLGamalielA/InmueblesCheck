@@ -35,6 +35,7 @@ android {
 }
 
 dependencies {
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("androidx.room:room-runtime:2.6.1") //Persistencia Offline (Room)
     annotationProcessor("androidx.room:room-compiler:2.6.1") // Se usa annotationProcessor en vez de kapt
     implementation("androidx.work:work-runtime:2.9.0") //Sincronización en Segundo Plano"
@@ -53,6 +54,7 @@ dependencies {
     implementation("com.google.guava:guava:31.0.1-android")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")
+
 
     implementation(libs.appcompat)
     implementation(libs.material)

@@ -1,105 +1,100 @@
 package com.example.inmueblecheck;
 
-import android.util.Log;
+import android.app.Application;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import java.util.ArrayList;
+import com.google.firebase.auth.FirebaseAuth;
 import java.util.List;
-import java.util.Map;
+import java.util.UUID;
 
-public class GerenteViewModel extends ViewModel {
+public class GerenteViewModel extends AndroidViewModel {
 
-    private static final String TAG = "GerenteViewModel";
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private MutableLiveData<List<Inspeccion>> inspecciones = new MutableLiveData<>();
-    private MutableLiveData<String> error = new MutableLiveData<>();
-    private MutableLiveData<Boolean> saveSuccess = new MutableLiveData<>();
-    public GerenteViewModel() {
-        fetchInspecciones();
+    private final InmuebleRepository repository;
+    private final MutableLiveData<String> error = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> saveSuccess = new MutableLiveData<>();
+
+    public GerenteViewModel(@NonNull Application application) {
+        super(application);
+        repository = new InmuebleRepository(application);
     }
-    public LiveData<List<Inspeccion>> getInspecciones() { return inspecciones; }
+
+    public LiveData<List<Inmueble>> getMisInmuebles() {
+        return repository.getMisInmuebles();
+    }
+
+    // Método para obtener un solo inmueble (para editar)
+    public LiveData<Inmueble> getInmuebleById(String id) {
+        return repository.getInmuebleById(id);
+    }
+
     public LiveData<String> getError() { return error; }
     public LiveData<Boolean> getSaveSuccess() { return saveSuccess; }
     public void resetSaveSuccess() { saveSuccess.setValue(false); }
     public void clearError() { error.setValue(null); }
 
+    /**
+     * Guarda (Crea o Actualiza) un inmueble.
+     * @param idToUpdate Si es null, crea uno nuevo. Si tiene valor, actualiza ese ID.
+     */
+    public void guardarInmueble(String idToUpdate, String direccion, double precio, String tipo,
+                                String descripcion, String contacto,
+                                double lat, double lon, String photoUri) {
 
+        String userId = FirebaseAuth.getInstance().getUid();
+        String userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
 
-    // Carga las inspecciones
-    public void fetchInspecciones() {
-        db.collection("inspecciones")
-                .orderBy("fechaCreacion", Query.Direction.DESCENDING)
-                .addSnapshotListener((value, e) -> {
-                    if (e != null) {
-                        Log.w(TAG, "Listen falló.", e);
-                        error.setValue("Error al cargar inspecciones: " + e.getMessage());
-                        return;
-                    }
-
-                    List<Inspeccion> lista = new ArrayList<>();
-                    for (DocumentSnapshot doc : value) {
-                        Inspeccion insp = doc.toObject(Inspeccion.class);
-                        if (insp != null) {
-                            insp.setDocumentId(doc.getId());
-                            lista.add(insp);
-                        }
-                    }
-                    inspecciones.setValue(lista);
-                });
-    }
-
-    // Carga la lista de agentes
-    public LiveData<List<User>> fetchAgentes() {
-        MutableLiveData<List<User>> agentes = new MutableLiveData<>();
-        db.collection("users")
-                .whereEqualTo("role", "agente")
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<User> listaAgentes = new ArrayList<>();
-                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                        User agente = doc.toObject(User.class);
-                        if (agente != null) {
-                            agente.setUid(doc.getId());
-                            listaAgentes.add(agente);
-                        }
-                    }
-                    agentes.setValue(listaAgentes);
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Error al cargar agentes", e);
-                    error.setValue("Error al cargar agentes");
-                });
-        return agentes;
-    }
-
-    // Crea una nueva inspección en Firestore
-    public void crearInspeccion(String direccion, User agenteSeleccionado) {
-        if (direccion.isEmpty() || agenteSeleccionado == null) {
-            error.setValue("Dirección y Agente son requeridos");
-            saveSuccess.setValue(false);
+        if (userId == null) {
+            error.setValue("Sesión no válida");
             return;
         }
 
-        Inspeccion nuevaInspeccion = new Inspeccion(
-                direccion,
-                agenteSeleccionado.getUid(),
-                agenteSeleccionado.getEmail()
-        );
+        Inmueble inmueble;
 
-        db.collection("inspecciones")
-                .add(nuevaInspeccion)
-                .addOnSuccessListener(documentReference -> {
-                    Log.d(TAG, "Inspección creada con ID: " + documentReference.getId());
-                    saveSuccess.setValue(true);
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Error al crear inspección", e);
-                    error.setValue("Error al crear inspección");
-                    saveSuccess.setValue(false);
-                });
+        if (idToUpdate == null) {
+            // MODO CREAR: Nuevo objeto con ID nuevo
+            inmueble = new Inmueble(direccion, precio, tipo, userId, userEmail);
+        } else {
+            // MODO EDITAR: Reconstruimos el objeto conservando el ID original
+            // Nota: Al usar Room @Insert(REPLACE), esto sobrescribirá el registro existente
+            inmueble = new Inmueble();
+            inmueble.setUid(idToUpdate); // IMPORTANTE: Usar el mismo ID
+            inmueble.setArrendadorId(userId);
+            inmueble.setArrendadorEmail(userEmail);
+            inmueble.setDireccion(direccion);
+            inmueble.setPrecio(precio);
+            inmueble.setTipoTransaccion(tipo);
+            inmueble.setStatusSync("pendiente_sync"); // Marcar para resubir cambios
+            // La fecha de creación idealmente se conserva, pero Firestore server timestamp la manejará
+        }
+
+        // Setear campos comunes
+        inmueble.setDescripcion(descripcion);
+        inmueble.setDatosContacto(contacto);
+        inmueble.setLatitud(lat);
+        inmueble.setLongitud(lon);
+
+        if (photoUri != null) {
+            inmueble.setFotoPortada(photoUri);
+        }
+
+        // 1. Guardar/Actualizar en DB Local
+        repository.crearInmueble(inmueble); // "crearInmueble" usa INSERT OR REPLACE, sirve para ambos
+
+        // 2. Gestionar Foto en tabla Media
+        if (photoUri != null && !photoUri.isEmpty()) {
+            Media media = new Media();
+            media.setMediaId(UUID.randomUUID().toString());
+            media.setInspectionId(inmueble.getUid());
+            media.setItemName("Foto Principal");
+            media.setLocalUri(photoUri);
+            media.setType("image");
+            media.setSynced(false);
+
+            repository.insertMedia(media);
+        }
+
+        saveSuccess.setValue(true);
     }
 }

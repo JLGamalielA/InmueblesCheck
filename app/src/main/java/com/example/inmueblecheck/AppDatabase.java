@@ -8,26 +8,22 @@ import androidx.room.TypeConverters;
 import androidx.room.TypeConverter;
 import java.util.Date;
 
-
 class Converters {
     @TypeConverter
     public static Date fromTimestamp(Long value) {
         return value == null ? null : new Date(value);
     }
-
     @TypeConverter
     public static Long dateToTimestamp(Date date) {
         return date == null ? null : date.getTime();
     }
 }
 
-
-
-@Database(entities = {Inspeccion.class, ChecklistItem.class, Media.class}, version = 2, exportSchema = false)
+@Database(entities = {Inmueble.class, Media.class}, version = 2, exportSchema = false)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 
-    public abstract InspeccionDao inspeccionDao();
+    public abstract InmuebleDao inmuebleDao();
     private static volatile AppDatabase INSTANCE;
 
     static AppDatabase getDatabase(final Context context) {
@@ -36,8 +32,8 @@ public abstract class AppDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                                     AppDatabase.class, "inmueblecheck_database")
-                                    .fallbackToDestructiveMigration()
-                                    .build();
+                            .fallbackToDestructiveMigration()
+                            .build();
                 }
             }
         }

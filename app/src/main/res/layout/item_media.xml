@@ -7,6 +7,12 @@
     android:layout_margin="8dp"
     app:cardElevation="2dp">
 
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="fragment_login" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

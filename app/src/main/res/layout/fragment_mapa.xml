@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- El Mapa de Google -->
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Barra de Filtros Flotante -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:clipToPadding="false"
+        android:paddingHorizontal="16dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- GRUPO TIPO: Selección única (Venta o Renta) -->
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/cgTipo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:singleSelection="true"
+                app:selectionRequired="false"
+                android:layout_marginEnd="8dp">
+
+                <!-- Chip Venta -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipVenta"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Venta"
+                    android:textColor="@color/text_chip_filter"
+                    app:chipBackgroundColor="@color/bg_chip_filter"
+                    app:chipStrokeColor="@color/blue_primary"
+                    app:chipStrokeWidth="1dp"
+                    app:checkedIconVisible="true"
+                    app:checkedIconTint="@color/white"/>
+
+                <!-- Chip Renta -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipRenta"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Renta"
+                    android:textColor="@color/text_chip_filter"
+                    app:chipBackgroundColor="@color/bg_chip_filter"
+                    app:chipStrokeColor="@color/blue_primary"
+                    app:chipStrokeWidth="1dp"
+                    app:checkedIconVisible="true"
+                    app:checkedIconTint="@color/white"/>
+            </com.google.android.material.chip.ChipGroup>
+
+            <!-- Separador visual -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="24dp"
+                android:background="#808080"
+                android:layout_marginEnd="8dp"/>
+
+            <!-- FILTRO PRECIO (Botón desplegable) -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipPrecio"
+                style="@style/Widget.MaterialComponents.Chip.Action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Precio"
+                android:textColor="@color/blue_primary"
+                app:chipBackgroundColor="@color/white"
+                app:chipStrokeColor="@color/blue_primary"
+                app:chipStrokeWidth="1dp"
+                app:chipIcon="@android:drawable/ic_menu_sort_by_size"
+                app:chipIconTint="@color/blue_primary"/>
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

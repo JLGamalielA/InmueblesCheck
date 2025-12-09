@@ -1,70 +1,92 @@
 package com.example.inmueblecheck;
 
-import android.util.Log;
+import android.app.Application;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+import androidx.lifecycle.Transformations;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-public class AgenteViewModel extends ViewModel {
+public class AgenteViewModel extends AndroidViewModel {
 
-    private final MutableLiveData<List<Inspeccion>> inspecciones = new MutableLiveData<>();
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final FirebaseAuth auth = FirebaseAuth.getInstance();
-    private ListenerRegistration listenerRegistration;
+    private final InmuebleRepository repository;
+    private final LiveData<List<Inmueble>> catalogoCompleto;
+    private final LiveData<List<Inmueble>> misPropiedades;
 
-    public LiveData<List<Inspeccion>> getAllInspecciones() {
-        if (listenerRegistration == null) {
-            cargarInspeccionesEnTiempoReal();
-        }
-        return inspecciones;
+    // Filtros
+    private final MutableLiveData<String> filtroTipo = new MutableLiveData<>(null); // "Venta", "Renta", null
+
+    // Filtro de Rango de Precio (null = sin filtro)
+    // Usamos un array [min, max]. Si max es -1, significa "y más".
+    private final MutableLiveData<double[]> rangoPrecio = new MutableLiveData<>(null);
+
+    public AgenteViewModel(@NonNull Application application) {
+        super(application);
+        repository = new InmuebleRepository(application);
+        catalogoCompleto = repository.getCatalogoInmuebles();
+        misPropiedades = repository.getMisInmuebles();
+    }
+
+    private LiveData<List<Inmueble>> aplicarFiltros(LiveData<List<Inmueble>> listaBase) {
+        return Transformations.switchMap(listaBase, lista ->
+                Transformations.switchMap(filtroTipo, tipo ->
+                        Transformations.map(rangoPrecio, rango -> {
+                            if (lista == null) return new ArrayList<>();
+
+                            List<Inmueble> filtrada = new ArrayList<>();
+
+                            for (Inmueble i : lista) {
+                                boolean pasaTipo = (tipo == null) || (i.getTipoTransaccion() != null && i.getTipoTransaccion().equalsIgnoreCase(tipo));
+                                boolean pasaPrecio = true;
+
+                                if (rango != null) {
+                                    double precio = i.getPrecio();
+                                    double min = rango[0];
+                                    double max = rango[1];
+
+                                    if (max == -1) {
+                                        // Rango: "X o más" (ej: 500 en adelante)
+                                        if (precio < min) pasaPrecio = false;
+                                    } else {
+                                        // Rango: "Entre X y Y" (ej: 0 a 500)
+                                        if (precio < min || precio > max) pasaPrecio = false;
+                                    }
+                                }
+
+                                if (pasaTipo && pasaPrecio) {
+                                    filtrada.add(i);
+                                }
+                            }
+                            return filtrada;
+                        })
+                )
+        );
+    }
+
+    public LiveData<List<Inmueble>> getCatalogoFiltrado() { return aplicarFiltros(catalogoCompleto); }
+    public LiveData<List<Inmueble>> getMisPropiedadesFiltradas() { return aplicarFiltros(misPropiedades); }
+
+    // Setters
+    public void setFiltroTipo(String tipo) { filtroTipo.setValue(tipo); }
+
+    public void setRangoPrecio(double min, double max) {
+        rangoPrecio.setValue(new double[]{min, max});
+    }
+
+    public void limpiarFiltroPrecio() {
+        rangoPrecio.setValue(null);
     }
 
     public void recargarDatos() {
-        if (listenerRegistration != null) {
-            listenerRegistration.remove();
-            listenerRegistration = null;
-        }
-        cargarInspeccionesEnTiempoReal();
+        String current = filtroTipo.getValue();
+        filtroTipo.setValue(current);
     }
 
-    private void cargarInspeccionesEnTiempoReal() {
-        String uid = auth.getUid();
-        if (uid == null) return;
-
-        Query query = db.collection("inspecciones")
-                .whereEqualTo("agentId", uid) // Asegúrate que en Firebase sea 'agentId'
-                .orderBy("fechaCreacion", Query.Direction.DESCENDING);
-
-        listenerRegistration = query.addSnapshotListener((snapshots, e) -> {
-            if (e != null) {
-                Log.e("AgenteViewModel", "Error escuchando datos", e);
-                return;
-            }
-
-            if (snapshots != null) {
-                List<Inspeccion> lista = new ArrayList<>();
-                for (QueryDocumentSnapshot doc : snapshots) {
-                    Inspeccion inspeccion = doc.toObject(Inspeccion.class);
-                    inspeccion.setDocumentId(doc.getId());
-                    lista.add(inspeccion);
-                }
-                inspecciones.setValue(lista);
-            }
-        });
-    }
-
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-        if (listenerRegistration != null) {
-            listenerRegistration.remove();
-        }
-    }
+    // Compatibilidad
+    public void aplicarFiltro(String tipo) { setFiltroTipo(tipo); }
+    public LiveData<List<Inmueble>> getCatalogoInmuebles() { return getCatalogoFiltrado(); }
 }

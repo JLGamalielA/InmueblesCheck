@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_explorar"
+            android:icon="@drawable/ic_home_black"
+            android:title="Explorar Inmuebles" />
+        <item
+            android:id="@+id/nav_mapa"
+            android:icon="@android:drawable/ic_dialog_map"
+            android:title="Mapa Interactivo" />
+    </group>
+
+    <item android:title="Filtros">
+        <menu>
+            <item
+                android:id="@+id/nav_filtro_venta"
+                android:icon="@drawable/ic_propiedad"
+                android:title="Solo Venta" />
+            <item
+                android:id="@+id/nav_filtro_renta"
+                android:icon="@drawable/ic_propiedad"
+                android:title="Solo Renta" />
+            <item
+                android:id="@+id/nav_filtro_todos"
+                android:icon="@drawable/ic_all"
+                android:title="Ver Todos" />
+        </menu>
+    </item>
+
+    <item android:title="Más">
+        <menu>
+            <item
+                android:id="@+id/nav_about"
+                android:icon="@android:drawable/ic_menu_info_details"
+                android:title="Acerca de" />
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/logout"
+                android:title="Salir" />
+        </menu>
+    </item>
+</menu>
