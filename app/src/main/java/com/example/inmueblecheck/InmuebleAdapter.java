@@ -5,7 +5,7 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton; // Importante
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -20,23 +20,16 @@ public class InmuebleAdapter extends RecyclerView.Adapter<InmuebleAdapter.Inmueb
 
     private List<Inmueble> listaInmuebles = new ArrayList<>();
     private OnInmuebleClickListener clickListener;
-    private OnEditarClickListener editarListener; // Nuevo listener
+    private OnEditarClickListener editarListener;
+    private OnEstadoClickListener estadoListener; // Nuevo listener para Historial
 
-    public interface OnInmuebleClickListener {
-        void onInmuebleClick(Inmueble inmueble);
-    }
+    public interface OnInmuebleClickListener { void onInmuebleClick(Inmueble inmueble); }
+    public interface OnEditarClickListener { void onEditarClick(Inmueble inmueble); }
+    public interface OnEstadoClickListener { void onEstadoClick(Inmueble inmueble); }
 
-    public interface OnEditarClickListener { // Nueva interfaz
-        void onEditarClick(Inmueble inmueble);
-    }
-
-    public void setOnInmuebleClickListener(OnInmuebleClickListener listener) {
-        this.clickListener = listener;
-    }
-
-    public void setOnEditarClickListener(OnEditarClickListener listener) { // Setter para editar
-        this.editarListener = listener;
-    }
+    public void setOnInmuebleClickListener(OnInmuebleClickListener listener) { this.clickListener = listener; }
+    public void setOnEditarClickListener(OnEditarClickListener listener) { this.editarListener = listener; }
+    public void setOnEstadoClickListener(OnEstadoClickListener listener) { this.estadoListener = listener; }
 
     public void setInmuebles(List<Inmueble> inmuebles) {
         this.listaInmuebles = inmuebles;
@@ -52,7 +45,7 @@ public class InmuebleAdapter extends RecyclerView.Adapter<InmuebleAdapter.Inmueb
 
     @Override
     public void onBindViewHolder(@NonNull InmuebleViewHolder holder, int position) {
-        holder.bind(listaInmuebles.get(position), clickListener, editarListener);
+        holder.bind(listaInmuebles.get(position), clickListener, editarListener, estadoListener);
     }
 
     @Override
@@ -63,7 +56,7 @@ public class InmuebleAdapter extends RecyclerView.Adapter<InmuebleAdapter.Inmueb
     static class InmuebleViewHolder extends RecyclerView.ViewHolder {
         private TextView tvDireccion, tvPrecio, tvTipo;
         private ImageView ivFoto;
-        private ImageButton btnEditar; // Referencia al botón
+        private ImageButton btnEditar, btnEstado;
 
         public InmuebleViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -72,16 +65,16 @@ public class InmuebleAdapter extends RecyclerView.Adapter<InmuebleAdapter.Inmueb
             tvTipo = itemView.findViewById(R.id.tvStatus);
             ivFoto = itemView.findViewById(R.id.ivInmuebleFoto);
             btnEditar = itemView.findViewById(R.id.btnEditar);
+            btnEstado = itemView.findViewById(R.id.btnEstado);
         }
 
-        public void bind(Inmueble inmueble, OnInmuebleClickListener listener, OnEditarClickListener editListener) {
+        public void bind(Inmueble inmueble, OnInmuebleClickListener clickListener,
+                         OnEditarClickListener editListener, OnEstadoClickListener stateListener) {
             Context context = itemView.getContext();
 
             tvDireccion.setText(inmueble.getDireccion());
-
             NumberFormat format = NumberFormat.getCurrencyInstance(Locale.getDefault());
-            String precioStr = format.format(inmueble.getPrecio());
-            tvPrecio.setText(precioStr);
+            tvPrecio.setText(format.format(inmueble.getPrecio()));
 
             String tipo = inmueble.getTipoTransaccion() != null ? inmueble.getTipoTransaccion() : "N/A";
             tvTipo.setText(tipo.toUpperCase());
@@ -95,26 +88,38 @@ public class InmuebleAdapter extends RecyclerView.Adapter<InmuebleAdapter.Inmueb
             }
 
             if (inmueble.getFotoPortada() != null && !inmueble.getFotoPortada().isEmpty()) {
-                Glide.with(context)
-                        .load(inmueble.getFotoPortada())
-                        .placeholder(R.drawable.ic_home_black)
-                        .error(R.drawable.ic_home_black)
-                        .centerCrop()
-                        .into(ivFoto);
+                Glide.with(context).load(inmueble.getFotoPortada()).centerCrop().into(ivFoto);
             } else {
                 ivFoto.setImageResource(R.drawable.ic_home_black);
             }
 
-            // Lógica del botón Editar
+            // Lógica Botón Editar
             if (editListener != null) {
                 btnEditar.setVisibility(View.VISIBLE);
                 btnEditar.setOnClickListener(v -> editListener.onEditarClick(inmueble));
             } else {
-                btnEditar.setVisibility(View.GONE); // Ocultar si no hay listener (para el cliente)
+                btnEditar.setVisibility(View.GONE);
+            }
+
+            // Lógica Botón Estado (Historial)
+            if (stateListener != null) {
+                btnEstado.setVisibility(View.VISIBLE);
+                btnEstado.setOnClickListener(v -> stateListener.onEstadoClick(inmueble));
+
+                // Cambiar icono según estado actual
+                if ("disponible".equals(inmueble.getEstado())) {
+                    // Si está disponible, el icono es "Archivar/Marcar Rentado"
+                    btnEstado.setImageResource(android.R.drawable.checkbox_on_background);
+                } else {
+                    // Si está en historial, el icono es "Restaurar/Reciclar"
+                    btnEstado.setImageResource(android.R.drawable.ic_menu_revert);
+                }
+            } else {
+                btnEstado.setVisibility(View.GONE);
             }
 
             itemView.setOnClickListener(v -> {
-                if (listener != null) listener.onInmuebleClick(inmueble);
+                if (clickListener != null) clickListener.onInmuebleClick(inmueble);
             });
         }
     }

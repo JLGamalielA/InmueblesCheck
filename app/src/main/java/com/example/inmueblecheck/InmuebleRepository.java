@@ -20,7 +20,7 @@ import java.util.concurrent.Executors;
 public class InmuebleRepository {
 
     private static final String TAG = "InmuebleRepo";
-    private final InmuebleDao inmuebleDao; // Usamos el nuevo DAO
+    private final InmuebleDao inmuebleDao;
     private final FirebaseFirestore db;
     private final WorkManager workManager;
     private final ExecutorService executor;
@@ -35,29 +35,38 @@ public class InmuebleRepository {
 
     // --- MÉTODOS PARA EL ARRENDADOR (DUEÑO) ---
 
-    // Obtener SOLO mis propiedades
+    // Obtener SOLO mis propiedades ACTIVAS
     public LiveData<List<Inmueble>> getMisInmuebles() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             refreshMisInmueblesFromFirestore(user.getUid());
-            return inmuebleDao.getMyInmuebles(user.getUid());
+            // CORRECCIÓN: Usamos el nuevo nombre del método en el DAO
+            return inmuebleDao.getMisInmueblesActivos(user.getUid());
         }
-        return null; // O retornar LiveData vacío
+        return null;
     }
 
-    // Guardar un nuevo inmueble (Primero local, luego intenta sync)
+    // Obtener historial (Opcional, si lo usas desde el Repo en vez del ViewModel directamente)
+    public LiveData<List<Inmueble>> getMisInmueblesHistorial() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            return inmuebleDao.getMisInmueblesHistorial(user.getUid());
+        }
+        return null;
+    }
+
     public void crearInmueble(Inmueble inmueble) {
         executor.execute(() -> {
             inmuebleDao.insertInmueble(inmueble);
             Log.d(TAG, "Inmueble guardado localmente: " + inmueble.getDireccion());
-            scheduleSync(); // Intenta subirlo si hay red
+            scheduleSync();
         });
     }
+
     public void insertMedia(Media media) {
         executor.execute(() -> inmuebleDao.insertMedia(media));
     }
 
-    // Sincronizar mis datos desde la nube
     private void refreshMisInmueblesFromFirestore(String userId) {
         db.collection("inmuebles")
                 .whereEqualTo("arrendadorId", userId)
@@ -72,8 +81,10 @@ public class InmuebleRepository {
                             for (DocumentSnapshot doc : snapshots) {
                                 Inmueble i = doc.toObject(Inmueble.class);
                                 if (i != null) {
-                                    i.setUid(doc.getId()); // Asegurar ID correcto
-                                    i.setStatusSync("sincronizado"); // Viene de la nube
+                                    i.setUid(doc.getId());
+                                    i.setStatusSync("sincronizado");
+                                    // Asegurar que tenga estado si viene de versiones viejas
+                                    if (i.getEstado() == null) i.setEstado("disponible");
                                     lista.add(i);
                                 }
                             }
@@ -85,10 +96,9 @@ public class InmuebleRepository {
 
     // --- MÉTODOS PARA EL ARRENDATARIO (CLIENTE) ---
 
-    // Ver TODOS los inmuebles disponibles
     public LiveData<List<Inmueble>> getCatalogoInmuebles() {
         refreshCatalogoFromFirestore();
-        return inmuebleDao.getAllInmuebles();
+        return inmuebleDao.getAllInmuebles(); // Este ya filtra por 'disponible' en el DAO
     }
 
     private void refreshCatalogoFromFirestore() {
@@ -104,10 +114,11 @@ public class InmuebleRepository {
                                 if (i != null) {
                                     i.setUid(doc.getId());
                                     i.setStatusSync("sincronizado");
+                                    if (i.getEstado() == null) i.setEstado("disponible");
                                     lista.add(i);
                                 }
                             }
-                            inmuebleDao.insertAll(lista); // Cache local
+                            inmuebleDao.insertAll(lista);
                         });
                     }
                 });
@@ -119,7 +130,6 @@ public class InmuebleRepository {
         return inmuebleDao.getInmuebleById(id);
     }
 
-    // Programa el Worker para subir datos pendientes
     private void scheduleSync() {
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)

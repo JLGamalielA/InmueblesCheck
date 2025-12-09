@@ -2,31 +2,32 @@ package com.example.inmueblecheck;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.appbar.MaterialToolbar;
 
-public class GerenteDashboardFragment extends Fragment {
+public class HistorialFragment extends Fragment {
 
     private GerenteViewModel viewModel;
     private RecyclerView recyclerView;
     private InmuebleAdapter adapter;
     private ProgressBar progressBar;
     private MaterialToolbar toolbar;
+    private TextView tvTitulo, tvSubtitulo;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Reutilizamos el layout del dashboard porque es idéntico
         return inflater.inflate(R.layout.fragment_gerente_dashboard, container, false);
     }
 
@@ -37,6 +38,12 @@ public class GerenteDashboardFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerViewInspecciones);
         progressBar = view.findViewById(R.id.progressBar);
         toolbar = view.findViewById(R.id.toolbarGerente);
+        tvTitulo = view.findViewById(R.id.tvTituloDashboard);
+        tvSubtitulo = view.findViewById(R.id.tvSubtitulo);
+
+        // Personalizamos textos
+        tvTitulo.setText("Historial");
+        tvSubtitulo.setText("Propiedades rentadas o vendidas");
 
         viewModel = new ViewModelProvider(requireActivity()).get(GerenteViewModel.class);
         progressBar.setVisibility(View.VISIBLE);
@@ -50,48 +57,25 @@ public class GerenteDashboardFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
 
-        // 1. Ver Detalle
-        adapter.setOnInmuebleClickListener(inmueble -> {
-            if (inmueble != null && inmueble.getUid() != null) {
-                Bundle args = new Bundle();
-                args.putString("inmuebleId", inmueble.getUid());
-                try {
-                    Navigation.findNavController(requireView())
-                            .navigate(R.id.action_gerente_to_detalle, args);
-                } catch (Exception e) { Log.e("Nav", "Error", e); }
-            }
-        });
-
-        // 2. Editar
-        adapter.setOnEditarClickListener(inmueble -> {
-            if (inmueble != null && inmueble.getUid() != null) {
-                Bundle args = new Bundle();
-                args.putString("editInmuebleId", inmueble.getUid());
-                try {
-                    Navigation.findNavController(requireView())
-                            .navigate(R.id.action_gerenteDashboardFragment_to_crearInmuebleFragment, args);
-                } catch (Exception e) { Log.e("Nav", "Error", e); }
-            }
-        });
-
-        // 3. Mover a Historial
+        // Listener: Restaurar a Activos
         adapter.setOnEstadoClickListener(inmueble -> {
-            String accion = "Venta".equalsIgnoreCase(inmueble.getTipoTransaccion()) ? "vendido" : "rentado";
             new AlertDialog.Builder(getContext())
-                    .setTitle("¿Marcar como " + accion + "?")
-                    .setMessage("El inmueble se moverá al historial y dejará de ser visible para los clientes.")
+                    .setTitle("¿Reactivar propiedad?")
+                    .setMessage("Este inmueble volverá a estar disponible para todos.")
                     .setPositiveButton("Sí", (d, w) -> {
                         viewModel.alternarEstadoInmueble(inmueble);
-                        Toast.makeText(getContext(), "Inmueble movido al historial", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Inmueble reactivado", Toast.LENGTH_SHORT).show();
                     })
                     .setNegativeButton("Cancelar", null)
                     .show();
         });
+
+        // No ponemos listener de Editar en historial, o sí si quieres editar registros viejos
     }
 
     private void setupObservers() {
-        // Observamos SOLO los ACTIVOS
-        viewModel.getMisInmueblesActivos().observe(getViewLifecycleOwner(), inmuebles -> {
+        // Observamos HISTORIAL
+        viewModel.getMisInmueblesHistorial().observe(getViewLifecycleOwner(), inmuebles -> {
             adapter.setInmuebles(inmuebles);
             progressBar.setVisibility(View.GONE);
         });

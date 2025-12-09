@@ -10,16 +10,12 @@ import java.util.Date;
 
 class Converters {
     @TypeConverter
-    public static Date fromTimestamp(Long value) {
-        return value == null ? null : new Date(value);
-    }
+    public static Date fromTimestamp(Long value) { return value == null ? null : new Date(value); }
     @TypeConverter
-    public static Long dateToTimestamp(Date date) {
-        return date == null ? null : date.getTime();
-    }
+    public static Long dateToTimestamp(Date date) { return date == null ? null : date.getTime(); }
 }
 
-@Database(entities = {Inmueble.class, Media.class}, version = 2, exportSchema = false)
+@Database(entities = {Inmueble.class, Media.class}, version = 6, exportSchema = false)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 

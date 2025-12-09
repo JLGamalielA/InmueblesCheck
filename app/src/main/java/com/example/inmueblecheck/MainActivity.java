@@ -98,6 +98,17 @@ public class MainActivity extends AppCompatActivity {
                 aplicarFiltroYMostrarLista(null);
             }
 
+            // --- ACCIONES ARRENDADOR ---
+            else if (id == R.id.nav_crear_inmueble) {
+                navController.navigate(R.id.crearInmuebleFragment);
+            } else if (id == R.id.nav_mis_propiedades) {
+                navController.popBackStack(R.id.gerenteDashboardFragment, false);
+                navController.navigate(R.id.gerenteDashboardFragment);
+            } else if (id == R.id.nav_historial) {
+                // Nuevo: Navegar al historial
+                navController.navigate(R.id.historialFragment);
+            }
+
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
         });

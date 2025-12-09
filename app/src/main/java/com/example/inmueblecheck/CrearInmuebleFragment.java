@@ -53,7 +53,7 @@ public class CrearInmuebleFragment extends Fragment {
     private RadioGroup rgTipo;
     private Button btnGuardar;
     private FloatingActionButton btnFoto;
-    private MaterialSwitch switchUbicacion; // Nuestro Switch nuevo
+    private MaterialSwitch switchUbicacion;
     private TextView tvCoordenadas;
     private ImageView ivFoto;
     private ProgressBar progressBar;
