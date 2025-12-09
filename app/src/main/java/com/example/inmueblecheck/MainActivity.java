@@ -107,6 +107,8 @@ public class MainActivity extends AppCompatActivity {
             } else if (id == R.id.nav_historial) {
                 // Nuevo: Navegar al historial
                 navController.navigate(R.id.historialFragment);
+            }else if (id == R.id.nav_mensajes) {
+                navController.navigate(R.id.listaChatsFragment);
             }
 
             drawerLayout.closeDrawer(GravityCompat.START);

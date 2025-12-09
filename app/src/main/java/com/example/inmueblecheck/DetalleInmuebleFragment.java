@@ -3,6 +3,7 @@ package com.example.inmueblecheck;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,8 +33,12 @@ import java.util.Locale;
 
 public class DetalleInmuebleFragment extends Fragment implements OnMapReadyCallback {
 
+    private static final String TAG = "DetalleInmueble";
     private String inmuebleId;
     private DetalleInmuebleViewModel viewModel;
+
+    // Variable crítica: Guarda el objeto completo para usarlo al contactar
+    private Inmueble currentInmueble;
 
     private TextView tvPrecio, tvDireccion, tvDescripcion, tvSinFotos;
     private Chip chipTipo;
@@ -46,7 +51,7 @@ public class DetalleInmuebleFragment extends Fragment implements OnMapReadyCallb
 
     private double lat = 0, lon = 0;
     private String contactoStr = "";
-    private String tituloInmueble = ""; // Para el marcador
+    private String tituloInmueble = "";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -62,14 +67,13 @@ public class DetalleInmuebleFragment extends Fragment implements OnMapReadyCallb
         }
 
         if (inmuebleId == null) {
-            Toast.makeText(getContext(), "Error: Inmueble no encontrado", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Error: ID no recibido", Toast.LENGTH_SHORT).show();
             Navigation.findNavController(view).popBackStack();
             return;
         }
 
         initViews(view);
 
-        // Inicializar el mapa
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.mapLite);
         if (mapFragment != null) {
@@ -96,6 +100,7 @@ public class DetalleInmuebleFragment extends Fragment implements OnMapReadyCallb
         rvMedia.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         rvMedia.setAdapter(mediaAdapter);
 
+        // Listener del botón Contactar
         btnContactar.setOnClickListener(v -> contactarDueno());
     }
 
@@ -104,13 +109,20 @@ public class DetalleInmuebleFragment extends Fragment implements OnMapReadyCallb
         viewModel.setInmuebleId(inmuebleId);
         progressBar.setVisibility(View.VISIBLE);
 
+        // Observar datos del inmueble
         viewModel.getInmueble().observe(getViewLifecycleOwner(), inmueble -> {
             progressBar.setVisibility(View.GONE);
             if (inmueble != null) {
+                // GUARDAR REFERENCIA (CRÍTICO)
+                this.currentInmueble = inmueble;
                 llenarDatos(inmueble);
+            } else {
+                Log.e(TAG, "Inmueble cargado es nulo");
+                Toast.makeText(getContext(), "No se pudo cargar la información", Toast.LENGTH_SHORT).show();
             }
         });
 
+        // Observar fotos
         viewModel.getMediaList().observe(getViewLifecycleOwner(), mediaList -> {
             if (mediaList != null && !mediaList.isEmpty()) {
                 mediaAdapter.setMedia(mediaList);
@@ -139,18 +151,15 @@ public class DetalleInmuebleFragment extends Fragment implements OnMapReadyCallb
         String tipo = inmueble.getTipoTransaccion() != null ? inmueble.getTipoTransaccion().toUpperCase() : "RENTA";
         chipTipo.setText(tipo);
 
-        // --- LÓGICA DE VISIBILIDAD PARA EL DUEÑO ---
+        // Ocultar botón si soy el dueño
         String currentUserId = FirebaseAuth.getInstance().getUid();
-
         if (currentUserId != null && currentUserId.equals(inmueble.getArrendadorId())) {
-            // Si soy el dueño, oculto el botón de contactar
             btnContactar.setVisibility(View.GONE);
         } else {
-            // Si soy cliente, lo muestro
             btnContactar.setVisibility(View.VISIBLE);
         }
 
-        // Actualizar el mapa si ya está listo
+        // Actualizar mapa si ya cargó
         if (mMap != null && lat != 0 && lon != 0) {
             actualizarMapa();
         }
@@ -159,10 +168,9 @@ public class DetalleInmuebleFragment extends Fragment implements OnMapReadyCallb
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.getUiSettings().setScrollGesturesEnabled(false); // Desactivar scroll para no interferir con la pantalla
+        mMap.getUiSettings().setScrollGesturesEnabled(false);
         mMap.getUiSettings().setZoomGesturesEnabled(true);
 
-        // Si los datos llegaron antes que el mapa
         if (lat != 0 && lon != 0) {
             actualizarMapa();
         }
@@ -176,26 +184,62 @@ public class DetalleInmuebleFragment extends Fragment implements OnMapReadyCallb
     }
 
     private void contactarDueno() {
-        if (contactoStr == null || contactoStr.isEmpty()) {
-            Toast.makeText(getContext(), "No hay datos de contacto disponibles.", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Botón Contactar presionado");
+
+        // Validación 1: ¿Tenemos los datos cargados?
+        if (currentInmueble == null) {
+            Log.e(TAG, "Error: currentInmueble es null al presionar contactar");
+            Toast.makeText(getContext(), "Cargando datos, espera un momento...", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        Intent intent;
-        if (contactoStr.contains("@")) {
-            intent = new Intent(Intent.ACTION_SENDTO);
-            intent.setData(Uri.parse("mailto:"));
-            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{contactoStr});
-            intent.putExtra(Intent.EXTRA_SUBJECT, "Interés en Inmueble: " + tituloInmueble);
-        } else {
-            intent = new Intent(Intent.ACTION_DIAL);
-            intent.setData(Uri.parse("tel:" + contactoStr));
+        // Validación 2: ¿Hay ID de arrendador?
+        if (currentInmueble.getArrendadorId() == null) {
+            Log.e(TAG, "Error: arrendadorId es null");
+            Toast.makeText(getContext(), "Error: No se puede identificar al dueño", Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        try {
-            startActivity(intent);
-        } catch (Exception e) {
-            Toast.makeText(getContext(), "No se pudo abrir la app de contacto.", Toast.LENGTH_SHORT).show();
-        }
+        Log.d(TAG, "Iniciando chat con: " + currentInmueble.getArrendadorId());
+
+        // Feedback visual
+        btnContactar.setEnabled(false);
+        btnContactar.setText("Abriendo chat...");
+
+        ChatViewModel chatViewModel = new ViewModelProvider(this).get(ChatViewModel.class);
+
+        chatViewModel.iniciarChat(
+                currentInmueble.getArrendadorId(),
+                currentInmueble.getDireccion(),
+                currentInmueble.getUid(),
+                chatId -> {
+                    // Asegurar ejecución en hilo principal por si el callback viene de otro hilo
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            // Restaurar botón
+                            btnContactar.setEnabled(true);
+                            btnContactar.setText("Contactar Arrendador");
+
+                            if (chatId != null) {
+                                Log.d(TAG, "Chat iniciado/encontrado con ID: " + chatId);
+                                Bundle args = new Bundle();
+                                args.putString("chatId", chatId);
+                                args.putString("titulo", currentInmueble.getDireccion());
+
+                                try {
+                                    // Navegar al chat usando la acción global definida en nav_auth.xml
+                                    Navigation.findNavController(requireView()).navigate(R.id.action_global_conversacionFragment, args);
+                                } catch (Exception e) {
+                                    Log.e(TAG, "Error CRÍTICO navegando al fragmento de conversación", e);
+                                    Toast.makeText(getContext(), "Error de navegación al chat", Toast.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                Log.e(TAG, "Error: chatId devuelto es null (Fallo en creación)");
+                                Toast.makeText(getContext(), "Error al iniciar la conversación", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }
+        );
     }
 }

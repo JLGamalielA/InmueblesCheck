@@ -105,4 +105,23 @@
         android:label="Historial"
         tools:layout="@layout/fragment_gerente_dashboard" />
 
+    <fragment
+        android:id="@+id/listaChatsFragment"
+        android:name="com.example.inmueblecheck.ListaChatsFragment"
+        android:label="Mensajes"
+        tools:layout="@layout/fragment_lista_chats"/>
+
+    <fragment
+        android:id="@+id/conversacionFragment"
+        android:name="com.example.inmueblecheck.ConversacionFragment"
+        android:label="Chat"
+        tools:layout="@layout/fragment_conversacion">
+        <argument android:name="chatId" app:argType="string"/>
+        <argument android:name="titulo" app:argType="string"/>
+    </fragment>
+
+    <action
+        android:id="@+id/action_global_conversacionFragment"
+        app:destination="@id/conversacionFragment" />
+
 </navigation>

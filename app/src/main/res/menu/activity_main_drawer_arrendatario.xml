@@ -12,6 +12,10 @@
             android:id="@+id/nav_mapa"
             android:icon="@android:drawable/ic_dialog_map"
             android:title="Mapa Interactivo" />
+        <item
+            android:id="@+id/nav_mensajes"
+            android:icon="@android:drawable/ic_dialog_email"
+            android:title="Mensajes" />
     </group>
 
     <item android:title="Filtros">
